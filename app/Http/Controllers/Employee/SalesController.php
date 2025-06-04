@@ -8,6 +8,7 @@ use App\Models\SaleItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 
 class SalesController extends Controller
@@ -88,6 +89,123 @@ class SalesController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to record sale: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function processCurrentCart(Request $request)
+    {
+        $request->validate([
+            'payment_method' => 'required|string|in:cash,card,mobile',
+            'amount_received' => 'nullable|numeric|min:0',
+        ]);
+
+        $cart = Session::get('cart', []);
+
+        if (empty($cart)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cart is empty'
+            ], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Calculate totals
+            $subtotal = 0;
+            $totalItems = 0;
+
+            // Verify stock availability and calculate totals
+            foreach ($cart as $item) {
+                $product = Product::where('product_id', $item['product_id'])->first();
+
+                if (!$product) {
+                    throw new \Exception("Product {$item['name']} not found");
+                }
+
+                if ($product->quantity_in_stock < $item['quantity']) {
+                    throw new \Exception("Insufficient stock for {$item['name']}. Available: {$product->quantity_in_stock}");
+                }
+
+                $subtotal += $item['price'] * $item['quantity'];
+                $totalItems += $item['quantity'];
+            }
+
+            $taxAmount = $subtotal * 0.08; // 8% tax
+            $totalAmount = $subtotal + $taxAmount;
+
+            // Validate payment amount for cash
+            if ($request->payment_method === 'cash') {
+                if (!$request->amount_received || $request->amount_received < $totalAmount) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Insufficient payment amount'
+                    ], 400);
+                }
+            }
+
+            // Calculate change for cash payments
+            $amountReceived = $request->payment_method === 'cash' ? $request->amount_received : $totalAmount;
+            $changeGiven = $request->payment_method === 'cash' ? $amountReceived - $totalAmount : 0;
+
+            // Create sale record
+            $sale = Sale::create([
+                'employee_id' => auth()->id(),
+                'subtotal' => $subtotal,
+                'tax_amount' => $taxAmount,
+                'total_amount' => $totalAmount,
+                'payment_method' => $request->payment_method,
+                'amount_received' => $amountReceived,
+                'change_given' => $changeGiven,
+                'total_items' => $totalItems,
+                'sale_date' => now(),
+            ]);
+
+            // Create sale items and update product quantities
+            foreach ($cart as $item) {
+                // Create sale item
+                SaleItem::create([
+                    'sale_id' => $sale->sale_id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['price'],
+                    'total_price' => $item['price'] * $item['quantity'],
+                ]);
+
+                // Update product quantity
+                $product = Product::where('product_id', $item['product_id'])->first();
+                if ($product) {
+                    $product->quantity_in_stock -= $item['quantity'];
+                    $product->save();
+                }
+            }
+
+            // Clear the cart after successful sale
+            Session::forget('cart');
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sale completed successfully',
+                'sale' => [
+                    'sale_id' => $sale->sale_id,
+                    'subtotal' => $subtotal,
+                    'tax_amount' => $taxAmount,
+                    'total_amount' => $totalAmount,
+                    'payment_method' => $request->payment_method,
+                    'amount_received' => $amountReceived,
+                    'change_given' => $changeGiven,
+                    'total_items' => $totalItems,
+                    'sale_date' => $sale->sale_date->format('Y-m-d H:i:s'),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process sale: ' . $e->getMessage(),
             ], 500);
         }
     }

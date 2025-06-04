@@ -8,6 +8,7 @@ use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\Employee\RequestController as EmployeeRequestController;
 use App\Http\Controllers\Employee\ProductController as EmployeeProductController;
 use App\Http\Controllers\Employee\SalesController;
+use App\Http\Controllers\Employee\CartController;
 use App\Http\Controllers\Admin\SalesController as AdminSalesController;
 
 Route::get('/', function () {
@@ -55,8 +56,16 @@ Route::middleware(['auth', 'role:Employee'])->prefix('employee')->name('employee
     Route::post('/products', [EmployeeProductController::class, 'store'])->name('products.store');
     Route::get('/products/{product}', [EmployeeProductController::class, 'show'])->name('products.show');
 
+    // Cart routes
+    Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
+    Route::post('/cart/update', [CartController::class, 'updateCart'])->name('cart.update');
+    Route::post('/cart/remove', [CartController::class, 'removeFromCart'])->name('cart.remove');
+    Route::get('/cart', [CartController::class, 'getCart'])->name('cart.get');
+    Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
+
     // Sales routes
     Route::post('/sales', [SalesController::class, 'store'])->name('sales.store');
+    Route::post('/sales/process-cart', [SalesController::class, 'processCurrentCart'])->name('sales.process-cart');
     Route::get('/sales/daily', [SalesController::class, 'dailySales'])->name('sales.daily');
     Route::get('/sales/report', [SalesController::class, 'employeeSalesReport'])->name('sales.report');
     Route::get('/sales/today', [SalesController::class, 'todaysSummary'])->name('sales.today');

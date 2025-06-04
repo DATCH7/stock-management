@@ -301,7 +301,7 @@
                                 <div class="space-y-4">
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm text-gray-600">Total Stock Value</span>
-                                        <span class="text-sm font-semibold text-gray-900">${{ number_format(\App\Models\Product::sum(\DB::raw('quantity_in_stock * price')), 2) }}</span>
+                                        <span class="text-sm font-semibold text-gray-900">{{ number_format(\App\Models\Product::sum(\DB::raw('quantity_in_stock * price')), 2) }} DHS</span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm text-gray-600">Active Products</span>

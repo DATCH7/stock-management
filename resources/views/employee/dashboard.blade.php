@@ -144,7 +144,7 @@
                                         <div class="space-y-1 mb-3">
                                             <div class="flex justify-between items-center">
                                                 <span class="text-xs text-gray-500">Price:</span>
-                                                <span class="text-sm font-bold text-gray-900">${{ number_format($product->price, 2) }}</span>
+                                                <span class="text-sm font-bold text-gray-900">{{ number_format($product->price, 2) }} DHS</span>
                                             </div>
                                             <div class="flex justify-between items-center">
                                                 <span class="text-xs text-gray-500">Available:</span>
@@ -164,12 +164,12 @@
                                                         value="1"
                                                         class="quantity-input w-12 px-1 py-0.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-gray-500">
                                                     <span class="text-xs text-gray-500">×</span>
-                                                    <span class="text-xs text-gray-900">${{ number_format($product->price, 2) }}</span>
+                                                    <span class="text-xs text-gray-900">{{ number_format($product->price, 2) }} DHS</span>
                                                 </div>
 
                                                 <div class="flex items-center justify-between mb-2">
                                                     <span class="text-xs font-medium text-gray-700">Total:</span>
-                                                    <span class="total-price text-sm font-bold text-green-600">${{ number_format($product->price, 2) }}</span>
+                                                    <span class="total-price text-sm font-bold text-green-600">{{ number_format($product->price, 2) }} DHS</span>
                                                 </div>
 
                                                 <button type="button"
@@ -351,19 +351,19 @@
                 <!-- Subtotal -->
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-sm text-gray-600">Subtotal:</span>
-                    <span id="cart-subtotal" class="text-sm font-medium text-gray-900">$0.00</span>
+                    <span id="cart-subtotal" class="text-sm font-medium text-gray-900">0.00 DHS</span>
                 </div>
 
                 <!-- Tax (optional) -->
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-sm text-gray-600">Tax (8%):</span>
-                    <span id="cart-tax" class="text-sm font-medium text-gray-900">$0.00</span>
+                    <span id="cart-tax" class="text-sm font-medium text-gray-900">0.00 DHS</span>
                 </div>
 
                 <!-- Total -->
                 <div class="flex justify-between items-center mb-4 pt-2 border-t border-gray-300">
                     <span class="text-lg font-semibold text-gray-900">Total:</span>
-                    <span id="cart-total" class="text-xl font-bold text-green-600">$0.00</span>
+                    <span id="cart-total" class="text-xl font-bold text-green-600">0.00 DHS</span>
                 </div>
 
                 <!-- Payment Section -->
@@ -383,7 +383,7 @@
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                             placeholder="0.00">
                         <div id="change-amount" class="text-sm text-gray-600 hidden">
-                            Change: <span class="font-semibold text-green-600">$0.00</span>
+                            Change: <span class="font-semibold text-green-600">0.00 DHS</span>
                         </div>
                     </div>
                 </div>
@@ -413,7 +413,7 @@
         </svg>
         <span id="cart-count" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center hidden">0</span>
         <div id="cart-total-badge" class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 bg-white text-green-600 text-xs font-bold px-2 py-1 rounded-full shadow-md hidden">
-            $0.00
+            0.00 DHS
         </div>
     </button>
 
@@ -529,9 +529,9 @@
                 cartCount.style.display = 'none';
                 cartTotalBadge.style.display = 'none';
                 checkoutBtn.disabled = true;
-                cartSubtotal.textContent = '$0.00';
-                cartTax.textContent = '$0.00';
-                cartTotal.textContent = '$0.00';
+                cartSubtotal.textContent = '0.00 DHS';
+                cartTax.textContent = '0.00 DHS';
+                cartTotal.textContent = '0.00 DHS';
                 totalItems.textContent = '0';
                 return;
             }

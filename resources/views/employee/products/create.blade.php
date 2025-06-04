@@ -95,11 +95,11 @@
                                 <!-- Price -->
                                 <div>
                                     <label for="price" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Price <span class="text-red-500">*</span>
+                                        Price (DHS) <span class="text-red-500">*</span>
                                     </label>
                                     <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span class="text-gray-500 sm:text-sm">$</span>
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <span class="text-gray-500 sm:text-sm">DHS</span>
                                         </div>
                                         <input type="number"
                                             id="price"
@@ -107,7 +107,7 @@
                                             value="{{ old('price') }}"
                                             step="0.01"
                                             min="0"
-                                            class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors @error('price') border-red-500 @enderror"
+                                            class="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors @error('price') border-red-500 @enderror"
                                             required>
                                     </div>
                                     @error('price')
@@ -158,7 +158,7 @@
                                         <div class="space-y-2 mb-4">
                                             <div class="flex justify-between items-center">
                                                 <span class="text-sm text-gray-500">Price:</span>
-                                                <span id="preview-price" class="text-lg font-bold text-gray-900">$0.00</span>
+                                                <span id="preview-price" class="text-lg font-bold text-gray-900">0.00 DHS</span>
                                             </div>
                                             <div class="flex justify-between items-center">
                                                 <span class="text-sm text-gray-500">Available:</span>
@@ -202,7 +202,7 @@
             document.getElementById('preview-name').textContent = name;
             document.getElementById('preview-category').textContent = category;
             document.getElementById('preview-description').textContent = description;
-            document.getElementById('preview-price').textContent = '$' + price.toFixed(2);
+            document.getElementById('preview-price').textContent = price.toFixed(2) + ' DHS';
             document.getElementById('preview-stock').textContent = stock + ' units';
         }
 
