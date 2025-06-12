@@ -354,11 +354,7 @@
                     <span id="cart-subtotal" class="text-sm font-medium text-gray-900">0.00 DHS</span>
                 </div>
 
-                <!-- Tax (optional) -->
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm text-gray-600">Tax (8%):</span>
-                    <span id="cart-tax" class="text-sm font-medium text-gray-900">0.00 DHS</span>
-                </div>
+
 
                 <!-- Total -->
                 <div class="flex justify-between items-center mb-4 pt-2 border-t border-gray-300">
@@ -406,14 +402,16 @@
         </div>
     </div>
 
-    <!-- Cart Toggle Button -->
-    <button id="cart-toggle" class="fixed bottom-6 right-6 w-16 h-16 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-colors z-40">
-        <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z"></path>
-        </svg>
-        <span id="cart-count" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center hidden">0</span>
-        <div id="cart-total-badge" class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 bg-white text-green-600 text-xs font-bold px-2 py-1 rounded-full shadow-md hidden">
-            0.00 DHS
+    <!-- Cart Toggle Button - Enhanced -->
+    <button id="cart-toggle" style="position: fixed !important; bottom: 24px !important; right: 24px !important; z-index: 9999 !important; display: block !important; width: 70px; height: 70px; background: #111827; color: white; border-radius: 50%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: none; cursor: pointer; transition: all 0.3s ease;">
+        <div class="relative">
+            <svg style="width: 32px; height: 32px; margin: 0 auto; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0h15M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z"></path>
+            </svg>
+            <span id="cart-count" style="position: absolute; top: -8px; right: -8px; width: 28px; height: 28px; background: #dc2626; color: white; font-size: 14px; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: none;">0</span>
+        </div>
+        <div style="position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; color: white;">
+            CART
         </div>
     </button>
 
@@ -445,7 +443,6 @@
     <script>
         // Shopping cart functionality
         let cart = [];
-        const TAX_RATE = 0.08; // 8% tax rate
 
         // Update quantity and total price
         document.querySelectorAll('.quantity-input').forEach(input => {
@@ -506,20 +503,15 @@
 
             updateCartDisplay();
 
-            // Auto-open cart if it's the first item
-            if (cart.length === 1 && cart[0].quantity === quantity) {
-                openCart();
-            }
+            // Removed auto-open cart functionality - cart will only open when clicked
         }
 
         function updateCartDisplay() {
             const cartItems = document.getElementById('cart-items');
             const emptyCart = document.getElementById('empty-cart');
             const cartSubtotal = document.getElementById('cart-subtotal');
-            const cartTax = document.getElementById('cart-tax');
             const cartTotal = document.getElementById('cart-total');
             const cartCount = document.getElementById('cart-count');
-            const cartTotalBadge = document.getElementById('cart-total-badge');
             const totalItems = document.getElementById('total-items');
             const checkoutBtn = document.getElementById('checkout-btn');
 
@@ -527,10 +519,8 @@
                 cartItems.innerHTML = '';
                 emptyCart.style.display = 'block';
                 cartCount.style.display = 'none';
-                cartTotalBadge.style.display = 'none';
                 checkoutBtn.disabled = true;
                 cartSubtotal.textContent = '0.00 DHS';
-                cartTax.textContent = '0.00 DHS';
                 cartTotal.textContent = '0.00 DHS';
                 totalItems.textContent = '0';
                 return;
@@ -538,20 +528,15 @@
 
             emptyCart.style.display = 'none';
             cartCount.style.display = 'flex';
-            cartTotalBadge.style.display = 'block';
             checkoutBtn.disabled = false;
 
             const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const tax = subtotal * TAX_RATE;
-            const total = subtotal + tax;
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
             cartCount.textContent = totalQuantity;
-            cartTotalBadge.textContent = '$' + total.toFixed(2);
             totalItems.textContent = totalQuantity;
-            cartSubtotal.textContent = '$' + subtotal.toFixed(2);
-            cartTax.textContent = '$' + tax.toFixed(2);
-            cartTotal.textContent = '$' + total.toFixed(2);
+            cartSubtotal.textContent = total.toFixed(2) + ' DHS';
+            cartTotal.textContent = total.toFixed(2) + ' DHS';
 
             cartItems.innerHTML = cart.map((item, index) => `
                 <div class="bg-white border border-gray-200 rounded-lg p-3">
@@ -568,9 +553,9 @@
                             <button onclick="updateQuantity('${item.productId}', -1)" class="w-6 h-6 bg-gray-200 rounded text-xs hover:bg-gray-300">-</button>
                             <span class="text-sm font-medium w-8 text-center">${item.quantity}</span>
                             <button onclick="updateQuantity('${item.productId}', 1)" class="w-6 h-6 bg-gray-200 rounded text-xs hover:bg-gray-300">+</button>
-                            <span class="text-xs text-gray-500">× $${item.price.toFixed(2)}</span>
+                            <span class="text-xs text-gray-500">× ${item.price.toFixed(2)} DHS</span>
                         </div>
-                        <span class="font-semibold text-gray-900">$${(item.price * item.quantity).toFixed(2)}</span>
+                        <span class="font-semibold text-gray-900">${(item.price * item.quantity).toFixed(2)} DHS</span>
                     </div>
                 </div>
             `).join('');
@@ -637,14 +622,14 @@
 
         // Calculate change
         document.getElementById('amount-received').addEventListener('input', function() {
-            const total = parseFloat(document.getElementById('cart-total').textContent.replace('$', ''));
+            const total = parseFloat(document.getElementById('cart-total').textContent.replace(' DHS', ''));
             const received = parseFloat(this.value) || 0;
             const change = received - total;
 
             const changeElement = document.getElementById('change-amount');
             if (received >= total && received > 0) {
                 changeElement.classList.remove('hidden');
-                changeElement.querySelector('span').textContent = '$' + change.toFixed(2);
+                changeElement.querySelector('span').textContent = change.toFixed(2) + ' DHS';
                 changeElement.querySelector('span').className = change >= 0 ? 'font-semibold text-green-600' : 'font-semibold text-red-600';
             } else {
                 changeElement.classList.add('hidden');
@@ -654,7 +639,7 @@
         // Process sale
         document.getElementById('process-sale').addEventListener('click', function() {
             const paymentMethod = document.getElementById('payment-method').value;
-            const total = parseFloat(document.getElementById('cart-total').textContent.replace('$', ''));
+            const total = parseFloat(document.getElementById('cart-total').textContent.replace(' DHS', ''));
             const received = parseFloat(document.getElementById('amount-received').value) || 0;
 
             if (paymentMethod === 'cash' && received < total) {
@@ -711,7 +696,7 @@
                             </div>
                             <div class="flex justify-between">
                                 <span>Total:</span>
-                                <span class="font-semibold">$${data.total.toFixed(2)}</span>
+                                <span class="font-semibold">${data.total.toFixed(2)} DHS</span>
                             </div>
                             <div class="flex justify-between">
                                 <span>Payment:</span>
@@ -720,11 +705,11 @@
                             ${paymentMethod === 'cash' ? `
                             <div class="flex justify-between">
                                 <span>Received:</span>
-                                <span>$${received.toFixed(2)}</span>
+                                <span>${received.toFixed(2)} DHS</span>
                             </div>
                             <div class="flex justify-between">
                                 <span>Change:</span>
-                                <span class="font-semibold text-green-600">$${data.change.toFixed(2)}</span>
+                                <span class="font-semibold text-green-600">${data.change.toFixed(2)} DHS</span>
                             </div>
                             ` : ''}
                         </div>

@@ -36,8 +36,8 @@ class SalesController extends Controller
                 $totalItems += $item['quantity'];
             }
 
-            $taxAmount = $subtotal * 0.08; // 8% tax
-            $totalAmount = $subtotal + $taxAmount;
+            $taxAmount = 0; // No tax - prices already include tax
+            $totalAmount = $subtotal;
 
             // Calculate change for cash payments
             $amountReceived = $request->payment_method === 'cash' ? $request->amount_received : $totalAmount;
@@ -132,8 +132,8 @@ class SalesController extends Controller
                 $totalItems += $item['quantity'];
             }
 
-            $taxAmount = $subtotal * 0.08; // 8% tax
-            $totalAmount = $subtotal + $taxAmount;
+            $taxAmount = 0; // No tax - prices already include tax
+            $totalAmount = $subtotal;
 
             // Validate payment amount for cash
             if ($request->payment_method === 'cash') {

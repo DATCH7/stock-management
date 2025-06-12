@@ -10,6 +10,9 @@ use App\Http\Controllers\Employee\ProductController as EmployeeProductController
 use App\Http\Controllers\Employee\SalesController;
 use App\Http\Controllers\Employee\CartController;
 use App\Http\Controllers\Admin\SalesController as AdminSalesController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\StockManagerController;
+use App\Http\Controllers\StockMovementController;
 
 Route::get('/', function () {
     if (!Auth::check()) {
@@ -35,10 +38,23 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', 'role:stock_manager'])->group(function () {
-    Route::get('/stock/dashboard', function () {
-        return view('dashboards.stock');
-    })->name('stock.dashboard');
+Route::middleware(['auth', 'role:stock_manager'])->prefix('stock')->name('stock.')->group(function () {
+    Route::get('/dashboard', [StockManagerController::class, 'dashboard'])->name('dashboard');
+    Route::get('/low-stock-report', [StockManagerController::class, 'lowStockReport'])->name('low-stock-report');
+    Route::get('/movements', [StockMovementController::class, 'movements'])->name('movements');
+    Route::get('/requests', [StockManagerController::class, 'pendingRequests'])->name('requests');
+    Route::post('/requests/{request}/approve', [StockManagerController::class, 'approveRequest'])->name('requests.approve');
+    Route::post('/requests/{request}/reject', [StockManagerController::class, 'rejectRequest'])->name('requests.reject');
+    Route::post('/requests/bulk-approve', [StockManagerController::class, 'bulkApproveRequests'])->name('requests.bulk-approve');
+    Route::post('/requests/bulk-reject', [StockManagerController::class, 'bulkRejectRequests'])->name('requests.bulk-reject');
+
+    // Stock Entry routes
+    Route::get('/entries/create', [StockMovementController::class, 'createEntry'])->name('entries.create');
+    Route::post('/entries', [StockMovementController::class, 'storeEntry'])->name('entries.store');
+
+    // Stock Exit routes
+    Route::get('/exits/create', [StockMovementController::class, 'createExit'])->name('exits.create');
+    Route::post('/exits', [StockMovementController::class, 'storeExit'])->name('exits.store');
 });
 
 Route::middleware(['auth', 'role:Employee'])->prefix('employee')->name('employee.')->group(function () {
@@ -88,6 +104,9 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     })->name('dashboard');
 
     Route::resource('users', UserController::class)->except(['show']);
+
+    // Product routes
+    Route::resource('products', AdminProductController::class);
 
     // Sales routes
     Route::get('/sales', [AdminSalesController::class, 'index'])->name('sales.index');

@@ -14,6 +14,7 @@ class Request extends Model
         'user_id',
         'quantity',
         'reason',
+        'priority',
         'request_date',
         'request_status',
         'approver_id',
@@ -74,5 +75,22 @@ class Request extends Model
     public function isRejected()
     {
         return $this->request_status === 'rejected';
+    }
+
+    public function isNewProductRequest()
+    {
+        return is_null($this->product_id);
+    }
+
+    public function getProductNameAttribute()
+    {
+        if ($this->isNewProductRequest()) {
+            // Extract product name from reason for new product requests
+            if (preg_match('/Product: (.+)\n/', $this->reason, $matches)) {
+                return $matches[1];
+            }
+            return 'New Product Request';
+        }
+        return $this->product ? $this->product->name : 'Unknown Product';
     }
 }

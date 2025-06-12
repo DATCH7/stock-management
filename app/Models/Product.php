@@ -11,6 +11,11 @@ class Product extends Model
 
     protected $primaryKey = 'product_id';
 
+    public function getRouteKeyName()
+    {
+        return 'product_id';
+    }
+
     protected $fillable = [
         'name',
         'description',
@@ -35,6 +40,16 @@ class Product extends Model
     public function requests()
     {
         return $this->hasMany(Request::class, 'product_id', 'product_id');
+    }
+
+    public function saleItems()
+    {
+        return $this->hasMany(SaleItem::class, 'product_id', 'product_id');
+    }
+
+    public function sales()
+    {
+        return $this->hasManyThrough(Sale::class, SaleItem::class, 'product_id', 'sale_id', 'product_id', 'sale_id');
     }
 
     // Helper methods
